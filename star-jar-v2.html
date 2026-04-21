@@ -111,6 +111,7 @@
   .jar-area {
     display: flex; flex-direction: column; align-items: center; gap: 10px;
     cursor: pointer;
+    width: fit-content;
   }
 
   /* 8-BIT JAR SVG */
@@ -256,41 +257,58 @@
   /* ===================== MOBILE ===================== */
   @media (max-width: 600px) {
 
-    /* smaller windows overall */
-    .win-body { padding: 10px; }
-    .titlebar { padding: 4px 6px; }
-    .titlebar-text { font-size: 8px; }
-    .win-btn { width: 12px; height: 12px; font-size: 7px; }
+    body {
+      overflow-y: auto;
+      justify-content: flex-start;
+      padding: 20px 0 100px;
+    }
 
-    /* title window */
+    /* title window — static flow, centred */
+    #titleWin {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      margin: 0 auto 24px;
+      width: 88vw;
+    }
+
+    /* jar — static flow, centred */
+    #jarWin {
+      position: relative !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      margin: 0 auto;
+      display: block;
+    }
+
+    #jarOuter { width: 200px !important; height: 242px !important; }
+
+    /* counter stays fixed at bottom */
+    #counterWin { bottom: 14px; }
+
+    /* font sizes */
     .title-text { font-size: 8px; line-height: 2; }
     .title-sub  { font-size: 8px; margin-top: 8px; line-height: 2; }
-
-    /* jar — scale down */
-    #jarWin { transform: translate(-50%, -52%); }
-    #jarOuter { width: 180px !important; height: 218px !important; }
-    #jarLid img { width: 180px; }
-
-    /* stars spread container — full screen with generous padding */
-    .stars-container { width: 100vw; height: calc(100vh - 120px); }
-
-    /* spread stars — slightly smaller on mobile */
-    .spread-star { touch-action: manipulation; }
-
-    /* counter / status */
+    .titlebar-text { font-size: 8px; }
+    .win-btn { width: 12px; height: 12px; font-size: 7px; }
+    .win-body { padding: 10px 12px; }
     .counter-text { font-size: 8px; }
-    #counterWin { bottom: 14px; }
+    .jar-hint { font-size: 8px; }
+
+    /* spread */
+    .stars-container { width: 100vw; height: calc(100vh - 100px); }
+    .spread-star { touch-action: manipulation; }
 
     /* back button */
     #backBtn-text { font-size: 8px; }
     #backBtn .win-body { padding: 8px 12px; }
     #backBtn { bottom: 14px; }
-
-    /* pick label */
     #pickLabel-text { font-size: 8px; }
     #pickLabel .win-body { padding: 5px 10px; }
 
-    /* note window */
+    /* note */
     .note-win { width: 94vw; max-width: 94vw; }
     .note-body-inner { padding: 10px 8px; gap: 8px; }
     .note-text { font-size: 11px; line-height: 2.4; }
@@ -302,16 +320,15 @@
     .alert-msg { font-size: 8px; }
     .alert-ok  { font-size: 8px; padding: 5px 12px; }
 
-    /* jar interior stars — scale with jar */
+    /* jar interior */
     .jar-stars-inside {
-      top: 60px !important;
-      left: 22px !important;
-      width: 136px !important;
-      height: 140px !important;
+      top: 70px !important;
+      left: 26px !important;
+      width: 148px !important;
+      height: 154px !important;
     }
   }
 
-  /* touch — bigger tap targets for spread stars */
   @media (hover: none) {
     .spread-star { min-width: 36px; min-height: 36px; }
   }
