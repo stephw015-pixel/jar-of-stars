@@ -260,35 +260,53 @@
     body {
       overflow-y: auto;
       justify-content: flex-start;
-      padding: 20px 0 100px;
+      align-items: center;
+      padding: 24px 0 120px;
     }
 
-    /* title window — static flow, centred */
+    /* pull titleWin and jarWin into normal flow */
     #titleWin {
       position: relative !important;
       left: auto !important;
       top: auto !important;
       transform: none !important;
-      margin: 0 auto 24px;
-      width: 88vw;
+      margin: 0 auto 20px !important;
+      width: min(88vw, 340px) !important;
     }
 
-    /* jar — static flow, centred */
     #jarWin {
       position: relative !important;
       left: auto !important;
       top: auto !important;
       transform: none !important;
-      margin: 0 auto;
-      display: block;
+      margin: 0 auto !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
     }
 
-    #jarOuter { width: 200px !important; height: 242px !important; }
+    /* hide desktop-only fixed windows while jar is showing */
+    #jarWin.hide {
+      opacity: 0 !important;
+      pointer-events: none !important;
+      transform: none !important;
+    }
+
+    /* jar size */
+    #jarOuter { width: 220px !important; height: 266px !important; }
+
+    /* jar interior */
+    .jar-stars-inside {
+      top: 70px !important;
+      left: 28px !important;
+      width: 164px !important;
+      height: 170px !important;
+    }
 
     /* counter stays fixed at bottom */
-    #counterWin { bottom: 14px; }
+    #counterWin { bottom: 16px; left: 50%; transform: translateX(-50%); }
 
-    /* font sizes */
+    /* fonts */
     .title-text { font-size: 8px; line-height: 2; }
     .title-sub  { font-size: 8px; margin-top: 8px; line-height: 2; }
     .titlebar-text { font-size: 8px; }
@@ -298,35 +316,28 @@
     .jar-hint { font-size: 8px; }
 
     /* spread */
-    .stars-container { width: 100vw; height: calc(100vh - 100px); }
+    .stars-container { width: 100vw !important; height: calc(100vh - 80px) !important; }
     .spread-star { touch-action: manipulation; }
 
-    /* back button */
+    /* labels */
+    #backBtn { bottom: 16px; }
     #backBtn-text { font-size: 8px; }
     #backBtn .win-body { padding: 8px 12px; }
-    #backBtn { bottom: 14px; }
     #pickLabel-text { font-size: 8px; }
     #pickLabel .win-body { padding: 5px 10px; }
+    #pickLabel { top: 16px; }
 
     /* note */
-    .note-win { width: 94vw; max-width: 94vw; }
+    .note-win { width: 94vw !important; max-width: 94vw !important; }
     .note-body-inner { padding: 10px 8px; gap: 8px; }
     .note-text { font-size: 11px; line-height: 2.4; }
     .note-num  { font-size: 8px; }
     .note-hint { font-size: 8px; }
 
     /* alert */
-    #alertWin { bottom: 100px; }
+    #alertWin { bottom: 90px; }
     .alert-msg { font-size: 8px; }
     .alert-ok  { font-size: 8px; padding: 5px 12px; }
-
-    /* jar interior */
-    .jar-stars-inside {
-      top: 70px !important;
-      left: 26px !important;
-      width: 148px !important;
-      height: 154px !important;
-    }
   }
 
   @media (hover: none) {
@@ -652,6 +663,15 @@ function makeDraggable(win) {
 // init all windows as draggable
 document.querySelectorAll('.win').forEach(makeDraggable);
 
+// On mobile, override inline fixed position on jarWin so it flows normally
+if (window.innerWidth <= 600) {
+  const jw = document.getElementById('jarWin');
+  jw.style.position = 'relative';
+  jw.style.left = 'auto';
+  jw.style.top = 'auto';
+  jw.style.transform = 'none';
+}
+
 // ===================== JAR CLICK =====================
 document.getElementById('jarArea').addEventListener('click', () => {
   if (isOpen) return;
@@ -856,7 +876,13 @@ document.getElementById('backBtnInner').addEventListener('click', () => {
     isOpen = false;
     document.querySelectorAll('.win').forEach(w => w.classList.remove('hide'));
 
-    // fade jar back in
+    // fade jar back in with correct position for device
+    if (window.innerWidth <= 600) {
+      jarWin.style.position = 'relative';
+      jarWin.style.left = 'auto';
+      jarWin.style.top = 'auto';
+      jarWin.style.transform = 'none';
+    }
     jarWin.style.transition = 'opacity 0.4s steps(5)';
     requestAnimationFrame(() => requestAnimationFrame(() => { jarWin.style.opacity = '1'; }));
 
