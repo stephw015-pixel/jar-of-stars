@@ -343,9 +343,108 @@
   @media (hover: none) {
     .spread-star { min-width: 36px; min-height: 36px; }
   }
+
+  /* ===================== WELCOME SCREEN ===================== */
+  #welcomeScreen {
+    position: fixed; inset: 0; z-index: 200;
+    background: #0a0a1a;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.8s steps(8);
+    overflow: hidden;
+  }
+  #welcomeScreen.fade-out { opacity: 0; pointer-events: none; }
+
+  .welcome-stars-bg { position:absolute; inset:0; pointer-events:none; }
+
+  .welcome-content {
+    position: relative; z-index: 10;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 0;
+    text-align: center;
+    padding: 24px;
+  }
+
+  .welcome-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 13px; color: #ddddff;
+    line-height: 2.2;
+    animation: wFadeIn 1s steps(4) 0.5s both;
+  }
+  .welcome-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px; color: #ffcc44;
+    text-shadow: 0 0 20px rgba(255,204,68,0.6);
+    margin: 18px 0 24px;
+    animation: wFadeIn 1s steps(4) 1s both;
+    letter-spacing: 2px;
+  }
+  .welcome-msg {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px; color: #aaaadd;
+    line-height: 2.6; max-width: 340px;
+    animation: wFadeIn 1s steps(4) 1.6s both;
+  }
+  .welcome-btn {
+    margin-top: 40px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px; color: #88aaff;
+    background: none; border: 2px solid #5555bb;
+    padding: 12px 24px; cursor: pointer;
+    box-shadow: 3px 3px 0 #000;
+    animation: wFadeIn 1s steps(4) 2.4s both, wBlink 1.2s steps(1) 2.4s infinite;
+    letter-spacing: 1px;
+  }
+  .welcome-btn:hover { background: #1a1a4e; color: #ffffff; }
+  .welcome-btn:active { transform: translate(2px,2px); box-shadow: none; }
+
+  @keyframes wFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes wBlink {
+    0%,74%{opacity:1} 75%,100%{opacity:0.3}
+  }
+
+  /* ===================== SHOOTING STARS ===================== */
+  .shooting-star {
+    position: fixed; pointer-events: none; z-index: 1;
+    image-rendering: pixelated;
+    animation: shoot var(--dur) steps(12) var(--delay) forwards;
+    opacity: 0;
+  }
+  @keyframes shoot {
+    0%   { opacity: 0; transform: translate(0, 0); }
+    5%   { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--tx), var(--ty)); }
+  }
+
+  @media (max-width: 600px) {
+    .welcome-title { font-size: 9px; }
+    .welcome-name  { font-size: 13px; }
+    .welcome-msg   { font-size: 8px; max-width: 88vw; }
+    .welcome-btn   { font-size: 8px; padding: 10px 18px; margin-top: 28px; }
+  }
 </style>
 </head>
 <body>
+
+<!-- WELCOME SCREEN -->
+<div id="welcomeScreen">
+  <div class="welcome-stars-bg" id="welcomeBg"></div>
+  <div class="welcome-content">
+    <div class="welcome-title">hello, traveller.</div>
+    <div class="welcome-name">✦</div>
+    <div class="welcome-msg">
+      you've found something<br>
+      made just for wanderers like you.<br>
+      30 stars. each one has a message.
+    </div>
+    <button class="welcome-btn" id="welcomeBtn">[ enter the cosmos ]</button>
+  </div>
+</div>
+
 <div class="scanlines"></div>
 <div class="starfield" id="starfield"></div>
 
@@ -909,6 +1008,71 @@ document.querySelectorAll('.win').forEach(win => {
     win.classList.add('focused');
   });
 });
+
+// ===================== WELCOME SCREEN =====================
+(function() {
+  const wbg = document.getElementById('welcomeBg');
+  const wCols = ['#ffffff','#aaaaee','#88aaff','#ffcc44','#cc88ff','#ff88aa','#88ffcc'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'px-star';
+    const sz = Math.random() < 0.6 ? 2 : 3;
+    const col = wCols[Math.floor(Math.random()*wCols.length)];
+    el.style.cssText = `width:${sz}px;height:${sz}px;background:${col};top:${Math.random()*100}%;left:${Math.random()*100}%;position:absolute;--d:${1.5+Math.random()*3}s;--dl:-${Math.random()*3}s;animation:twinkle var(--d) steps(1) infinite var(--dl)`;
+    wbg.appendChild(el);
+  }
+  document.getElementById('welcomeBtn').addEventListener('click', () => {
+    const ws = document.getElementById('welcomeScreen');
+    ws.classList.add('fade-out');
+    setTimeout(() => { ws.style.display = 'none'; }, 900);
+  });
+})();
+
+// ===================== SHOOTING STARS =====================
+(function() {
+  const colors = ['#ffffff','#ffcc44','#88aaff','#ff88aa','#aaffcc','#cc88ff'];
+
+  function spawnShootingStar() {
+    const el = document.createElement('div');
+    el.className = 'shooting-star';
+
+    const angle = 22 + Math.random() * 20;
+    const rad = angle * Math.PI / 180;
+    const dist = 280 + Math.random() * 180;
+    const dx = Math.cos(rad), dy = Math.sin(rad);
+    const tx = dx * dist, ty = dy * dist;
+    const sx = Math.random() * window.innerWidth * 0.7;
+    const sy = Math.random() * window.innerHeight * 0.25;
+
+    const col = colors[Math.floor(Math.random() * colors.length)];
+    const dur = 1.0 + Math.random() * 0.8;
+    const tailLen = 5 + Math.floor(Math.random() * 4);
+    const seg = 6;
+
+    let rects = `<rect x="-2" y="-2" width="4" height="4" fill="#ffffff" opacity="0.95"/>`;
+    for (let i = 1; i <= tailLen; i++) {
+      const op = (1 - i / (tailLen + 1)).toFixed(2);
+      const rx = Math.round(-dx * seg * i) - 2;
+      const ry = Math.round(-dy * seg * i) - 1;
+      rects += `<rect x="${rx}" y="${ry}" width="4" height="3" fill="${col}" opacity="${op}"/>`;
+    }
+
+    const cs = tailLen * seg + 20;
+    el.innerHTML = `<svg width="${cs}" height="${cs}" viewBox="${-cs/2} ${-cs/2} ${cs} ${cs}" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;overflow:visible">${rects}</svg>`;
+    el.style.cssText = `left:${sx}px;top:${sy}px;--tx:${tx}px;--ty:${ty}px;--dur:${dur}s;--delay:0s;`;
+
+    document.body.appendChild(el);
+    setTimeout(() => {
+      el.remove();
+      setTimeout(spawnShootingStar, 4000 + Math.random() * 8000);
+    }, dur * 1000 + 300);
+  }
+
+  setTimeout(spawnShootingStar, 2000);
+  setTimeout(spawnShootingStar, 6000 + Math.random() * 3000);
+  setTimeout(spawnShootingStar, 11000 + Math.random() * 4000);
+})();
+
 </script>
 </body>
 </html>
